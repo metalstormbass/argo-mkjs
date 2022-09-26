@@ -1,0 +1,54 @@
+name: Deployment Action
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  Pipeline-Job:
+    # Configure Environment
+    name: 'Snyk Test'
+    runs-on: ubuntu-latest
+    env: 
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+       
+    steps:
+    # Checkout Code
+    - uses: actions/checkout@v2
+      with:
+        ref: appdev
+
+    # Install and Authenticate to Snyk
+    - name: Install Snyk 
+      run: |
+         sudo npm install -g snyk
+
+    #Run Snyk Code
+    - name: Run Snyk Container
+      run: |
+         snyk code test --severity-threshold=high
+      continue-on-error: true  
+
+    #Install Dependencies and Run Snyk SCA
+    - name: Run Snyk Container
+      run: |
+         npm i
+         snyk test --severity-threshold=high
+      continue-on-error: true  
+
+    # Docker Build
+    - name: Build Container     
+      run: |
+         docker build .  -t michaelbraunbass/argo-mkjs
+
+    # Run Snyk Container     
+    - name: Run Snyk Container
+      run: |
+         snyk container test --file=Dockerfile michaelbraunbass/argo-mkjs --app-vulns --severity-threshold=high
+         snyk container monitor michaelbraunbass/argo-mkjs
+      continue-on-error: true  
+
+    - name: Login and Push to Dockerhub
+      run: |
+        docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }}       
+        docker push michaelbraunbass/argo-mkjs
+

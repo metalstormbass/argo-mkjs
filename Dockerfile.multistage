@@ -1,0 +1,17 @@
+#Dockerfile
+#Stage 1 - Build Image Poorly
+FROM debian:8.7 as builder
+WORKDIR mk
+COPY . /mk
+RUN apt-get update && apt install npm -y
+RUN apt install nmap -y
+RUN  npm install ./server
+
+
+#Stage 2 - Make image worse
+FROM debian:8.7 
+RUN  apt-get update && apt install nodejs debian-goodies -y
+WORKDIR mk
+COPY --from=builder mk ./
+EXPOSE 55555
+CMD nodejs ./server/server.js
