@@ -23,13 +23,13 @@ jobs:
          sudo npm install -g snyk
 
     #Run Snyk Code
-    - name: Run Snyk Container
+    - name: Run Snyk Code
       run: |
          snyk code test --severity-threshold=high
       continue-on-error: true  
 
     #Install Dependencies and Run Snyk SCA
-    - name: Run Snyk Container
+    - name: Run Snyk SCA
       run: |
          npm i
          snyk test --severity-threshold=high
