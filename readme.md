@@ -1,5 +1,6 @@
 # mk.js
 
+
 This is simple fighting game created with HTML5 canvas and JavaScript. It has three game modes:
 * `Basic` - with one active and on inactive player.
 * `Multiplayer` - with two active players on one computer.
